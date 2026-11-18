@@ -55,4 +55,3 @@ def test_ui_pages_import():
     assert callable(render_summarization_page)
     assert callable(render_similarity_page)
     assert callable(render_about_page)
-

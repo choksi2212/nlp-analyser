@@ -589,9 +589,11 @@ import streamlit as st
 import spacy
 from nltk.sentiment import SentimentIntensityAnalyzer
 
+
 @st.cache_resource(show_spinner="Loading English NLP model...")
 def load_spacy_model():
     return spacy.load("en_core_web_sm")
+
 
 @st.cache_resource(show_spinner=False)
 def load_vader():
@@ -605,8 +607,10 @@ Avoid caching raw user inputs indefinitely with `st.cache_data`; the app does no
 ```python
 MAX_CHARS = 10_000
 
+
 class InputValidationError(ValueError):
     pass
+
 
 def validate_text(text: str, field: str = "Text") -> str:
     if not isinstance(text, str):
@@ -625,6 +629,7 @@ from nltk.stem import PorterStemmer
 
 stemmer = PorterStemmer()
 
+
 def analyze_preprocessing(text, nlp):
     text = validate_text(text)
     doc = nlp(text)
@@ -636,10 +641,7 @@ def analyze_preprocessing(text, nlp):
         "filtered_words": [t.text for t in filtered],
         "stems": [stemmer.stem(t.lower_) for t in filtered],
         "lemmas": [t.lemma_.lower() for t in filtered],
-        "pos_tags": [
-            {"text": t.text, "pos": t.pos_, "tag": t.tag_}
-            for t in words
-        ],
+        "pos_tags": [{"text": t.text, "pos": t.pos_, "tag": t.tag_} for t in words],
     }
 ```
 
@@ -650,8 +652,7 @@ def extract_entities(text, nlp):
     text = validate_text(text)
     doc = nlp(text)
     entities = [
-        {"text": e.text, "label": e.label_,
-         "start": e.start_char, "end": e.end_char}
+        {"text": e.text, "label": e.label_, "start": e.start_char, "end": e.end_char}
         for e in doc.ents
     ]
     return {"entities": entities}
@@ -674,12 +675,15 @@ def analyze_sentiment(text, analyzer):
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
+
 def compare_documents(text_a, text_b):
     text_a = validate_text(text_a, "Text A")
     text_b = validate_text(text_b, "Text B")
     vectorizer = TfidfVectorizer(
-        lowercase=True, stop_words="english", ngram_range=(1, 2),
-        token_pattern=r"(?u)\b\w\w+\b"
+        lowercase=True,
+        stop_words="english",
+        ngram_range=(1, 2),
+        token_pattern=r"(?u)\b\w\w+\b",
     )
     matrix = vectorizer.fit_transform([text_a, text_b])
     score = float(cosine_similarity(matrix[0:1], matrix[1:2])[0, 0])
@@ -692,6 +696,7 @@ def compare_documents(text_a, text_b):
 import math
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
+
 
 def summarize_text(text, nlp, max_sentences=3):
     text = validate_text(text)
@@ -708,8 +713,12 @@ def summarize_text(text, nlp, max_sentences=3):
     ranked = sorted(range(len(sentences)), key=lambda i: (-scores[i], i))
     chosen = sorted(ranked[:k])
     summary = " ".join(sentences[i] for i in chosen)
-    return {"summary": summary, "selected_indices": chosen,
-            "sentence_scores": scores, "sentence_count": len(sentences)}
+    return {
+        "summary": summary,
+        "selected_indices": chosen,
+        "sentence_scores": scores,
+        "sentence_count": len(sentences),
+    }
 ```
 
 `numpy` is a transitive dependency of scikit-learn and is not actually used in this reference snippet; remove its import in the final implementation. The final function must additionally compute word counts, compression, warnings, and the common result envelope. Ensure the spaCy pipeline retains the parser or sentence boundary component.
@@ -720,10 +729,18 @@ def summarize_text(text, nlp, max_sentences=3):
 import streamlit as st
 
 st.set_page_config(page_title="LexiLab", page_icon="🧠", layout="wide")
-feature = st.sidebar.radio("Explore", [
-    "Overview", "Preprocessing", "Named Entities",
-    "Sentiment", "Summarization", "Similarity", "About"
-])
+feature = st.sidebar.radio(
+    "Explore",
+    [
+        "Overview",
+        "Preprocessing",
+        "Named Entities",
+        "Sentiment",
+        "Summarization",
+        "Similarity",
+        "About",
+    ],
+)
 # Delegate each page to a ui.pages function.
 # Each feature page owns its st.form, validation, call to service, and result display.
 # Never execute analysis solely because a text area changed.
@@ -797,12 +814,14 @@ These are aspirational targets. Benchmark on the actual demonstration machine; d
 ```python
 import pytest
 
+
 def test_similarity_is_symmetric():
     a = "The quick brown fox jumps over a log."
     b = "A brown fox leaps across the log."
     ab = compare_documents(a, b)["score"]
     ba = compare_documents(b, a)["score"]
     assert ab == pytest.approx(ba, abs=1e-10)
+
 
 def test_similarity_identical():
     text = "Natural language processing analyzes written language."
