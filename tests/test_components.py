@@ -34,3 +34,25 @@ def test_build_safe_entity_html_empty_entities():
     html_output = build_safe_entity_html(text, [])
     assert "<mark" not in html_output
     assert "Pure plain text without any named entities." in html_output
+
+
+def test_ui_pages_import():
+    """Verify all feature page renderers can be imported cleanly."""
+    from ui.pages import (
+        render_about_page,
+        render_entities_page,
+        render_overview_page,
+        render_preprocessing_page,
+        render_sentiment_page,
+        render_similarity_page,
+        render_summarization_page,
+    )
+
+    assert callable(render_overview_page)
+    assert callable(render_preprocessing_page)
+    assert callable(render_entities_page)
+    assert callable(render_sentiment_page)
+    assert callable(render_summarization_page)
+    assert callable(render_similarity_page)
+    assert callable(render_about_page)
+
