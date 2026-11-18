@@ -1,6 +1,8 @@
 """Cached resource loaders for expensive linguistic models and lexicons."""
 
+import nltk
 import spacy
+import spacy.cli
 from nltk.sentiment import SentimentIntensityAnalyzer
 from spacy.language import Language
 
@@ -26,27 +28,38 @@ def get_spacy_model() -> Language:
 
     Retains the standard pipeline components:
     tokenizer, tagger, parser, ner, lemmatizer.
+    Attempts automatic download if running in cloud deployment environments.
     """
     try:
-        nlp = spacy.load("en_core_web_sm")
-        return nlp
-    except Exception as exc:
-        raise InputValidationError(
-            "spaCy model 'en_core_web_sm' is not installed. "
-            "Please run: python -m spacy download en_core_web_sm",
-            code="MODEL_NOT_INSTALLED",
-        ) from exc
+        return spacy.load("en_core_web_sm")
+    except (OSError, LookupError):
+        # Fallback for cloud deployment environments (e.g. Streamlit Cloud)
+        try:
+            spacy.cli.download("en_core_web_sm")
+            return spacy.load("en_core_web_sm")
+        except Exception as exc:
+            raise InputValidationError(
+                "spaCy model 'en_core_web_sm' is not installed. "
+                "Please run: python -m spacy download en_core_web_sm",
+                code="MODEL_NOT_INSTALLED",
+            ) from exc
 
 
 @cache_resource(show_spinner=False)
 def get_vader_analyzer() -> SentimentIntensityAnalyzer:
-    """Load and cache the NLTK VADER sentiment analyzer."""
+    """Load and cache the NLTK VADER sentiment analyzer.
+
+    Attempts automatic download of vader_lexicon if missing in cloud deployment.
+    """
     try:
-        analyzer = SentimentIntensityAnalyzer()
-        return analyzer
-    except LookupError as exc:
-        raise InputValidationError(
-            "NLTK VADER lexicon is not downloaded. "
-            "Please run: python -c \"import nltk; nltk.download('vader_lexicon')\"",
-            code="LEXICON_NOT_INSTALLED",
-        ) from exc
+        return SentimentIntensityAnalyzer()
+    except LookupError:
+        try:
+            nltk.download("vader_lexicon", quiet=True)
+            return SentimentIntensityAnalyzer()
+        except Exception as exc:
+            raise InputValidationError(
+                "NLTK VADER lexicon is not downloaded. "
+                "Please run: python -c \"import nltk; nltk.download('vader_lexicon')\"",
+                code="LEXICON_NOT_INSTALLED",
+            ) from exc
