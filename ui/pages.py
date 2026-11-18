@@ -8,7 +8,6 @@ from core.constants import (
     APP_SUBTITLE,
     APP_TITLE,
     DEFAULT_SUMMARY_SENTENCES,
-    DOCUMENT_ID,
     MAX_INPUT_CHARACTERS,
     MAX_SUMMARY_SENTENCES,
     VERSION,
@@ -69,10 +68,10 @@ def render_overview_page() -> None:
     with col2:
         st.markdown(
             """
-            ### 🔒 Local-First & Viva-Ready Guarantees
+            ### 🔒 Local-First & Privacy Guarantees
             - **100% Offline Analysis:** All computation runs locally on your machine. Zero text is sent to cloud APIs.
             - **Zero Databases or Logins:** No account creation, database, or API keys required.
-            - **Deterministic & Interpretable:** Every transformation produces visible intermediate outputs suitable for academic vivas.
+            - **Deterministic & Interpretable:** Every transformation produces visible intermediate outputs for transparent analysis.
             - **Input Safety:** Strict character bounds and safe HTML escaping prevent runaway processes and script injections.
             """
         )
@@ -543,35 +542,34 @@ def render_similarity_page() -> None:
 
 
 def render_about_page() -> None:
-    """Render the architecture, syllabus mapping, and viva preparation page."""
+    """Render the architecture, pipeline overview, and technical FAQs."""
     render_header(
-        "About & Viva Preparation",
-        f"{DOCUMENT_ID} v{VERSION} — Architecture and Syllabus Traceability",
-        badge="Documentation",
+        "About & Technical Overview",
+        f"{APP_TITLE} v{VERSION} — System Architecture & Core NLP Capabilities",
+        badge="About",
     )
 
     tab1, tab2, tab3 = st.tabs(
-        ["Syllabus Traceability", "Viva Prep & FAQs", "System Architecture"]
+        ["NLP Pipeline Overview", "Technical FAQs", "System Architecture"]
     )
 
     with tab1:
-        st.markdown("### 📚 Academic Curriculum Alignment")
+        st.markdown("### 📚 Core NLP Pipeline & Coverage")
         st.markdown(
             """
-            | Unit | Syllabus Topic | LexiLab Implementation |
+            | Pipeline Stage | Topic / Capability | LexiLab Implementation |
             |---|---|---|
-            | **Unit 1** | NLP Pipeline, Components & Preprocessing | Centralized validation, modular services, UI separation |
-            | **Unit 2** | POS Tagging, Morphology & NER | spaCy transition-based tagger, fine tags, entity spans |
-            | **Unit 3** | Tokenization, Stop Words, Stemming, Lemmas | Comparative tokenization, Porter stemmer vs spaCy lemmatizer |
-            | **Unit 4** | Classification, Summarization & Extraction | NLTK VADER sentiment classification, extractive TF-IDF ranking |
-            | **Unit 5** | Document Distance & Similarity Metrics | Joint TF-IDF unigram+bigram cosine similarity |
-            | **Unit 6** | Machine Translation | *Explicitly out of scope (Non-goal)* |
+            | **Foundation** | Text Pipeline & Input Validation | Centralized validation, modular services, UI separation |
+            | **Morphology & Syntax** | POS Tagging, Lemmas & NER | spaCy transition-based tagger, fine tags, entity spans |
+            | **Lexical Processing** | Tokenization, Stop Words, Stemming | Comparative tokenization, Porter stemmer vs spaCy lemmatizer |
+            | **Text Analysis** | Sentiment Classification & Summarization | NLTK VADER sentiment classification, extractive TF-IDF ranking |
+            | **Vector Space** | Document Distance & Similarity | Joint TF-IDF unigram+bigram cosine similarity |
             """
         )
 
     with tab2:
-        st.markdown("### 🎓 Core Viva Questions & Answers")
-        viva_qas = [
+        st.markdown("### 💡 Frequently Asked Questions & Concepts")
+        faqs = [
             (
                 "What is the difference between Stemming and Lemmatization?",
                 "Stemming is a heuristic, rule-based approach that cuts off word suffixes without understanding grammar or checking if the result is a valid word (e.g., 'university' -> 'univers'). Lemmatization uses complete morphological analysis and dictionary lookups to find the canonical base form (lemma) based on part-of-speech context.",
@@ -590,10 +588,10 @@ def render_about_page() -> None:
             ),
             (
                 "Why is LexiLab designed local-first without databases?",
-                "To ensure zero privacy leaks, zero recurring API costs, reproducible deterministic execution during demonstrations, and resilience against network failures during live academic evaluations.",
+                "To ensure zero privacy leaks, zero recurring API costs, fast deterministic execution, and complete independence from internet connectivity or third-party server status.",
             ),
         ]
-        for q, a in viva_qas:
+        for q, a in faqs:
             with st.expander(f"❓ {q}"):
                 st.markdown(a)
 
